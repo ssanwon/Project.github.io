@@ -5,14 +5,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +28,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
@@ -45,7 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class Home_Fragment extends Fragment {
 
@@ -55,7 +51,6 @@ public class Home_Fragment extends Fragment {
     private final List<String> indexX = new ArrayList<>();
     private TextView text_time;
     private ArcProgress arc1;
-    private SwitchCompat switch1, switch2;
     private int valMax, valMin;
     private final DatabaseReference mData = FirebaseDatabase.getInstance().getReference();
 
@@ -69,8 +64,6 @@ public class Home_Fragment extends Fragment {
 
         realTimeLineChart();
 
-        setData();
-
         limitLine();
 
         return fm_home;
@@ -80,8 +73,6 @@ public class Home_Fragment extends Fragment {
         lineChart_temp = fm_home.findViewById(R.id.lineChart_temp);
         text_time = fm_home.findViewById(R.id.text_time);
         arc1 = fm_home.findViewById(R.id.arc1);
-        switch1 = fm_home.findViewById(R.id.switch1);
-        switch2 = fm_home.findViewById(R.id.switch2);
     }
 
     private void realTimeData() {
@@ -92,19 +83,6 @@ public class Home_Fragment extends Fragment {
 
                 text_time.setText("Thời gian cập nhật: " + currentData.time);
 
-                switch1.setChecked(currentData.status);
-
-                if (Objects.equals(currentData.unit, "°K")) {
-                    switch2.setChecked(true);
-                    arc1.setMax(473);
-                    arc1.setProgress(currentData.temp + 273);
-                }
-                else {
-                    switch2.setChecked(false);
-                    arc1.setMax(200);
-                    arc1.setProgress(currentData.temp);
-                }
-
                 arc1.setSuffixText(currentData.unit);
             }
 
@@ -112,18 +90,6 @@ public class Home_Fragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
-    }
-
-    private void setData() {
-        switch1.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            mData.child("Current/status").setValue(isChecked);
-        });
-        switch2.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked) {
-                mData.child("Current/unit").setValue("°K");
-            }
-            else mData.child("Current/unit").setValue("°C");
         });
     }
 
@@ -161,12 +127,6 @@ public class Home_Fragment extends Fragment {
     private void lineChartShow() {
         configChart();
         onTouchSingle();
-//        chartData.add(new Entry(7, 29));
-//        chartData.add(new Entry(8, 29));
-//        chartData.add(new Entry(9, 30));
-//        chartData.add(new Entry(10, 30));
-//        chartData.add(new Entry(11, 29));
-//        chartData.add(new Entry(12, 30));
 
         LineDataSet dataSet = new LineDataSet(chartData, "Nhiệt độ");
         dataSet.setDrawValues(false);
@@ -198,8 +158,8 @@ public class Home_Fragment extends Fragment {
                 SettingData settingData = snapshot.getValue(SettingData.class);
 
                 assert settingData != null;
-                valMax = settingData.tempMax;
-                valMin = settingData.tempMin;
+                valMax = Integer.parseInt(settingData.tempAlarm);
+                valMin = Integer.parseInt(settingData.tempAlarm) - Integer.parseInt(settingData.tempDelta1);
 
                 lineChartShow();
             }
@@ -219,13 +179,13 @@ public class Home_Fragment extends Fragment {
 //        xAxis.setValueFormatter(new IndexAxisValueFormatter(indexX)); // Định dạng nhãn trục x
 
         // Nhiệt độ cao nhất
-        LimitLine tempMax = new LimitLine(valMax, "Nhiệt độ cao nhất"); // Giá trị nhiệt độ cao nhất
+        LimitLine tempMax = new LimitLine(valMax, "Nhiệt độ bật cảnh báo"); // Giá trị nhiệt độ cao nhất
         tempMax.setLineColor(Color.RED);                                        // Màu sắc của đường giới hạn
         tempMax.setLineWidth(0.8f);                                             // Độ dày của đường giới hạn
         tempMax.setTextSize(12f);                                               // Kích thước văn bản đường giới hạn
 
         // Nhiệt độ thấp nhất
-        LimitLine tempMin = new LimitLine(valMin, "Nhiệt độ thấp nhất"); // Giá trị nhiệt độ thap nhất
+        LimitLine tempMin = new LimitLine(valMin, "Nhiệt độ tắt cảnh báo"); // Giá trị nhiệt độ thap nhất
         tempMin.setLineColor(Color.RED);                                        // Màu sắc của đường giới hạn
         tempMin.setLineWidth(0.8f);                                             // Độ dày của đường giới hạn
         tempMin.setTextSize(12f);                                               // Kích thước văn bản đường giới hạn
@@ -233,7 +193,7 @@ public class Home_Fragment extends Fragment {
         // Định dạng trục y
         YAxis yAxis = lineChart_temp.getAxisLeft();
         yAxis.setAxisMinimum(20f);                              // Giá trị tối thiểu của trục y
-        yAxis.setAxisMaximum(35f);                              // Giá trị tối đa của trục y
+        yAxis.setAxisMaximum(40f);                              // Giá trị tối đa của trục y
         yAxis.setGranularity(1f);                               // Độ dày giữa các điểm trục y
         yAxis.removeAllLimitLines();
         yAxis.addLimitLine(tempMax);

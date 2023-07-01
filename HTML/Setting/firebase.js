@@ -19,31 +19,51 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const db = getDatabase();
 
-var low_temp = 0;
-var high_temp = 0;
 var temp = 0;
-var measurement_time = 0;
-
-const ref_tempMin = ref(db, 'Setting/tempMin');
-onValue(ref_tempMin, (snapshot) => {
-    low_temp = snapshot.val();
-    document.getElementById('low_temp').value = low_temp;
-});
-
-const ref_tempMax = ref(db, 'Setting/tempMax');
-onValue(ref_tempMax, (snapshot) => {
-    high_temp = snapshot.val();
-    document.getElementById('high_temp').value = high_temp;
-});
+var tempDelta1 = 0;
+var tempAlarm = 0;
+var tempDelta2 = 0;
+var time = 0;
 
 const ref_temp = ref(db, 'Setting/temp');
-onValue(ref_tempMin, (snapshot) => {
+onValue(ref_temp, (snapshot) => {
     temp = snapshot.val();
     document.getElementById('temp').value = temp;
 });
 
+const ref_tempDelta1 = ref(db, 'Setting/tempDelta1');
+onValue(ref_tempDelta1, (snapshot) => {
+    tempDelta1 = snapshot.val();
+    document.getElementById('tempDelta1').value = tempDelta1;
+});
+
+const ref_tempAlarm = ref(db, 'Setting/tempAlarm');
+onValue(ref_tempAlarm, (snapshot) => {
+    tempAlarm = snapshot.val();
+    document.getElementById('tempAlarm').value = tempAlarm;
+});
+
+const ref_tempDelta2 = ref(db, 'Setting/tempDelta2');
+onValue(ref_tempDelta2, (snapshot) => {
+    tempDelta2 = snapshot.val();
+    document.getElementById('tempDelta2').value = tempDelta2;
+});
+
 const ref_time = ref(db, 'Setting/time');
 onValue(ref_time, (snapshot) => {
-    measurement_time = snapshot.val();
-    document.getElementById('measurement_time').value = measurement_time;
+    time = snapshot.val();
+    document.getElementById('time').value = time;
+});
+
+
+const bt_update = document.getElementById('bt_update');
+
+bt_update.addEventListener('click',(e) => {
+    update(ref(db, 'Setting'), {
+        temp: document.getElementById('temp').value,
+        tempDelta1: document.getElementById('tempDelta1').value,
+        tempAlarm: document.getElementById('tempAlarm').value,
+        tempDelta2: document.getElementById('tempDelta2').value,
+        time: document.getElementById('time').value,
+    });
 });

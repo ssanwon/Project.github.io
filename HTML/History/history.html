@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <title>Lịch sử</title>
     <link rel="stylesheet" href="../History/history.css" />
@@ -14,28 +13,43 @@
       <div class="sidebar">
         <ul>
           <li>
-            <img src="../Image/logo_HCMCUTE.png"
-              style="height: 90px; margin: 50px" alt="logo_HCMCUTE" />
+            <img
+              src="../Image/logo_HCMCUTE.png"
+              style="height: 90px; margin: 50px"
+              alt="logo_HCMCUTE"
+            />
           </li>
 
           <li><a href="../Home/index.html">Trang chủ</a></li>
           <li>
-            <a style="
+            <a
+              style="
                 background-color: #0668b8;
                 border-radius: 10px;
                 color: white;
                 padding: 10px;
-              " href="./alarm.html">Cảnh báo</a>
+              "
+              href="./alarm.html"
+              >Lịch sử</a
+            >
           </li>
-          <li><a onclick="exportToExcel()">Xuất</a></li>
+          <li><a href="../Export/export.html">Xuất</a></li>
           <li><a href="../Setting/setting.html">Cài đặt</a></li>
           <li><a href="../Login/login.html">Đăng xuất</a></li>
         </ul>
       </div>
-      <div class="content"></div>
+      <div class="content">
+        <h1 style="margin-left: 40%; font-size: 40px;">Lịch sử hoạt động</h1>
+          <h2 style="font-size: 35px; margin: 10px"></h2>
+          <div class="listHolder">
+            <ul class="list"></ul>
+          </div>
+        </Canhbao>
+      </div>
     </div>
     <!-- Thanh footer -->
     <footer>&copy; HỆ THỐNG GIÁM SÁT NHIỆT ĐỘ</footer>
   </body>
-  <script src="./history.js"></script>
+  <script src="./history.js" type="module"></script>
+  <script src="./alarm.js"></script>
 </html>

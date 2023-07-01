@@ -20,8 +20,7 @@ const database = getDatabase(app);
 const db = getDatabase();
 
 var temp = 0;
-var SW_1 = document.getElementById('SW_1');
-var SW_2 = document.getElementById('SW_2');
+var timeUpdate = 0;
 
 const ref_temp = ref(db, 'Current/temp');
 onValue(ref_temp, (snapshot) => {
@@ -29,38 +28,9 @@ onValue(ref_temp, (snapshot) => {
     document.getElementById('temperature').innerHTML = temp + "°C";
 });
 
-const ref_sw1 = ref(db, 'Current/status');
-onValue(ref_sw1, (snapshot) => {
-    console.log(snapshot.val());
-    if (snapshot.val()) {
-        SW_1.checked = true;
-    }
-    else {
-        SW_1.checked = false;
-    }
-});
-
-const ref_sw2 = ref(db, 'Current/unit');
-onValue(ref_sw2, (snapshot) => {
-    console.log(snapshot.val());
-    if (snapshot.val() == "°K") {
-        SW_2.checked = true;
-        document.getElementById('temperature').innerHTML = temp + 273 + "°K";
-    }
-    else {
-        SW_2.checked = false;
-        document.getElementById('temperature').innerHTML = temp + "°C";
-    }
-});
-
-SW_1.addEventListener('change',function(){
-    update(ref(db, 'Current'), { status: this.checked });
-});
-
-SW_2.addEventListener('change',function(){
-    if(this.checked) {
-        update(ref(db, 'Current'), { unit: "°K" });
-    } else {
-        update(ref(db, 'Current'), { unit: "°C" });
-    }
+const ref_chart = ref(db, 'Current/time');
+onValue(ref_chart, (snapshot) => {
+    timeUpdate = snapshot.val();
+    var time = timeUpdate.slice(0, 5);
+    addData(chartTemp, time, temp);
 });

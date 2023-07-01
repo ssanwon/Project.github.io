@@ -18,7 +18,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class History_Activity extends AppCompatActivity {
@@ -63,7 +65,10 @@ public class History_Activity extends AppCompatActivity {
         mHAdapter = new HistoryAdapter(mList);
         historyView.setAdapter(mHAdapter);
 
-        mData.child("History").addValueEventListener(new ValueEventListener() {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String currentDateandTime = sdf.format(new Date());
+
+        mData.child("History/" + currentDateandTime).addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

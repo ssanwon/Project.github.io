@@ -2,12 +2,12 @@ package com.example.app;
 
 public class ChartData {
     public String time;
-    public int val;
+    public float val;
 
     public ChartData() {
     }
 
-    public ChartData(String time, int val) {
+    public ChartData(String time, float val) {
         this.time = time;
         this.val = val;
     }

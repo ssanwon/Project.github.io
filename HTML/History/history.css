@@ -73,3 +73,20 @@ footer a {
 footer a:hover {
   text-decoration: underline;
 }
+
+
+.listHolder {
+  margin-left: 20px;
+  margin-top: 10px;
+  height: 600px; /* Set the desired height for the table */
+  overflow-y: scroll; /* Enable vertical scrolling */
+}
+
+.listName {
+  font-size: 20px;
+}
+
+.list li {
+  margin-top: 20px;
+  margin-left: 20px;
+}

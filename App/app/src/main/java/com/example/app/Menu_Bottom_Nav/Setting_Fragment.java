@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.app.CurrentData;
 import com.example.app.R;
 import com.example.app.SettingData;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -24,12 +26,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class Setting_Fragment extends Fragment {
 
     private View fm_setting;
     private Button bt_update;
     private FloatingActionButton fab;
-    private EditText temp_min, temp_max, temp, time;
+    private EditText tempSetting, tempDelta1, time, tempAlarm, tempDelta2;
     private final DatabaseReference mData = FirebaseDatabase.getInstance().getReference();
 
     @Override
@@ -50,19 +54,19 @@ public class Setting_Fragment extends Fragment {
     private void anhXa() {
         bt_update = fm_setting.findViewById(R.id.bt_update);
         fab = fm_setting.findViewById(R.id.fab);
-        temp_min = fm_setting.findViewById(R.id.temp_min);
-        temp_max = fm_setting.findViewById(R.id.temp_max);
-        temp = fm_setting.findViewById(R.id.temp);
+        tempSetting = fm_setting.findViewById(R.id.tempSetting);
+        tempDelta1 = fm_setting.findViewById(R.id.tempDelta1);
         time = fm_setting.findViewById(R.id.time);
+        tempAlarm = fm_setting.findViewById(R.id.tempAlarm);
+        tempDelta2 =fm_setting.findViewById(R.id.tempDelta2);
     }
 
     private void updateEvent() {
         bt_update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SettingData settingData = new SettingData(Integer.parseInt(temp_max.getText().toString()),
-                        Integer.parseInt(temp_min.getText().toString()), Integer.parseInt(temp.getText().toString()),
-                        Integer.parseInt(time.getText().toString()));
+                SettingData settingData = new SettingData(tempSetting.getText().toString(),
+                        tempDelta1.getText().toString(), time.getText().toString(), tempAlarm.getText().toString(), tempDelta2.getText().toString());
                 mData.child("Setting").setValue(settingData);
                 Toast.makeText(getActivity(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
             }
@@ -84,10 +88,11 @@ public class Setting_Fragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 SettingData settingData = snapshot.getValue(SettingData.class);
                 assert settingData != null;
-                temp_min.setText(String.valueOf(settingData.tempMin));
-                temp_max.setText(String.valueOf(settingData.tempMax));
-                temp.setText(String.valueOf(settingData.temp));
-                time.setText(String.valueOf(settingData.time));
+                tempSetting.setText(settingData.temp);
+                tempDelta1.setText(settingData.tempDelta1);
+                time.setText(settingData.time);
+                tempAlarm.setText(settingData.tempAlarm);
+                tempDelta2.setText(settingData.tempDelta2);
             }
 
             @Override

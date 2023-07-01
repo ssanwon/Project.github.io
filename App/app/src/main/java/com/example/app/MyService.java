@@ -1,5 +1,6 @@
 package com.example.app;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -20,12 +21,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+
 public class MyService extends Service {
 
     private final DatabaseReference mData = FirebaseDatabase.getInstance().getReference();
     private static final String CHANNEL_ID = "simplified_coding";
     private SettingData settingData;
     private CurrentData currentData;
+    private String timeOld = "";
+    private String timeOld1 = "";
 
     public MyService() {
 
@@ -61,9 +68,40 @@ public class MyService extends Service {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             currentData = snapshot.getValue(CurrentData.class);
                             if (currentData != null) {
-                                if (currentData.temp <= settingData.tempMin) sendNotification_1();
-                                else if (currentData.temp >= settingData.tempMax)
-                                    sendNotification_2();
+                                if (currentData.temp >= Integer.parseInt(settingData.tempAlarm))
+                                    sendNotification_1();
+
+                                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                                String currentDateandTime = sdf.format(new Date());
+
+                                if (!Objects.equals(currentData.time1, timeOld1)) {
+                                    if(currentData.status == 1) {
+                                        HistoryData historyData = new HistoryData("On", currentData.time1);
+                                        mData.child("History/" + currentDateandTime).push().setValue(historyData);
+                                        timeOld1 = currentData.time1;
+                                    }
+                                    else if (currentData.status == 0) {
+                                        HistoryData historyData = new HistoryData("Off", currentData.time1);
+                                        mData.child("History/" + currentDateandTime).push().setValue(historyData);
+                                        timeOld1 = currentData.time1;
+                                    }
+                                }
+
+                                if(!Objects.equals(currentData.time, timeOld)) {
+                                    timeOld = currentData.time;
+
+                                    int index = currentData.time.indexOf(" ");
+
+                                    String time1 = currentData.time.substring(0, index);
+
+                                    ChartData chartData = new ChartData(time1, currentData.temp);
+                                    mData.child("Chart/" + currentDateandTime).push().setValue(chartData);
+                                }
+
+//                                if(Objects.equals(currentData.unit, "°C")) {
+//
+//                                }
+
                             }
                         }
 
@@ -86,7 +124,7 @@ public class MyService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo)
                 .setContentTitle("Cảnh báo")
-                .setContentText("Nhiệt độ thấp quá mức cài đặt")
+                .setContentText("Nhiệt độ cao quá mức cài đặt")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 
